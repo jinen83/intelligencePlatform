@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DronaHQ Intelligence Platform</title>
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --bg-dark: #020617; 
+            --bg-card: #1e293b; 
+            --border: #334155; 
+            --text-main: #f8fafc; 
+            --text-muted: #94a3b8; 
+            --primary: #2563eb; 
+            --primary-light: #60a5fa; 
+            --accent-cyan: #22d3ee;
+            --accent-purple: #c084fc;
+            --accent-emerald: #34d399;
+            --accent-orange: #fb923c;
+            --accent-red: #f87171;
+            
+            /* Stage Colors for Slide 4 */
+            --color-naive: #60a5fa;
+            --color-inter: #c084fc;
+            --color-mature: #34d399;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- LAYOUT & UI ELEMENTS --- */
+        .progress-bar {
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--accent-cyan));
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+
+        header {
+            height: 80px;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo-area img {
+            height: 28px;
+            display: block;
+        }
+
+        .tagline {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        main {
+            flex: 1;
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 40px;
+        }
+
+        footer {
+            height: 90px;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            background: rgba(2, 6, 23, 0.9);
+            position: relative;
+            z-index: 999; /* Forces buttons to always be clickable */
+        }
+
+        .btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--bg-card);
+            color: var(--text-main);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #1d4ed8;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* --- SLIDE LOGIC & ANIMATIONS --- */
+        .slide {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            right: 40px;
+            bottom: 40px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .slide-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            letter-spacing: -1px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--primary-light), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .gradient-text-green {
+            background: linear-gradient(90deg, var(--accent-emerald), #a7f3d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- GENERAL SLIDE STYLES --- */
+        .card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: stretch; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        ul { list-style: none; }
+        ul.bulleted li::before {
+            content: "•";
+            color: var(--primary-light);
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        ul.bulleted li { padding-left: 1em; margin-bottom: 8px; color: var(--text-muted); }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-top: 4px solid var(--primary-light);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        /* --- SLIDE 4: MATURITY S-CURVE CSS --- */
+        .chart-container { width: 100%; display: flex; flex-direction: column; gap: 20px; height: 100%; }
+        .svg-wrapper { position: relative; width: 100%; flex: 1; min-height: 280px; border-left: 2px solid var(--border); border-bottom: 2px solid var(--border); border-radius: 0 0 0 8px; }
+        .y-axis-label { position: absolute; left: -40px; top: 50%; transform: translateY(-50%) rotate(-90deg); color: var(--text-muted); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; font-size: 0.75rem; white-space: nowrap; }
+        .x-axis-label { position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); color: var(--text-muted); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; font-size: 0.75rem; }
+        .zones-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; }
+        .zone { flex: 1; height: 100%; border-right: 1px dashed rgba(255, 255, 255, 0.1); position: relative; cursor: pointer; transition: all 0.3s ease; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.02)); }
+        .zone:last-child { border-right: none; }
+        .zone-title { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.8rem; padding: 6px 16px; border-radius: 50px; transition: all 0.3s ease; opacity: 0.6; }
+        .zone.naive:hover, .zone.naive.active { background: rgba(96, 165, 250, 0.08); }
+        .zone.naive:hover .zone-title, .zone.naive.active .zone-title { color: var(--color-naive); background: rgba(96, 165, 250, 0.15); opacity: 1; }
+        .zone.inter:hover, .zone.inter.active { background: rgba(192, 132, 252, 0.08); }
+        .zone.inter:hover .zone-title, .zone.inter.active .zone-title { color: var(--color-inter); background: rgba(192, 132, 252, 0.15); opacity: 1; }
+        .zone.mature:hover, .zone.mature.active { background: rgba(52, 211, 153, 0.08); }
+        .zone.mature:hover .zone-title, .zone.mature.active .zone-title { color: var(--color-mature); background: rgba(52, 211, 153, 0.15); opacity: 1; }
+        .s-curve-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+        .curve-path { fill: none; stroke: #475569; stroke-width: 6; stroke-linecap: round; }
+        .curve-glow { fill: none; stroke: var(--color-naive); stroke-width: 6; stroke-linecap: round; filter: drop-shadow(0 0 15px var(--color-naive)); transition: stroke 0.4s ease, filter 0.4s ease; }
+        .point { fill: var(--bg-card); stroke-width: 4; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .point.naive { stroke: var(--color-naive); }
+        .point.inter { stroke: var(--color-inter); }
+        .point.mature { stroke: var(--color-mature); }
+        .info-card { background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border); border-top: 4px solid var(--color-naive); border-radius: 12px; padding: 20px 24px; min-height: 120px; transition: border-color 0.4s ease; position: relative; overflow: hidden; margin-top: 20px; }
+        .info-content { transition: opacity 0.2s ease, transform 0.2s ease; }
+        .info-content.fade { opacity: 0; transform: translateY(10px); }
+        .info-subtitle { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: white; }
+        .info-details { color: var(--text-muted); font-size: 1rem; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <header>
+        <div class="logo-area">
+            <img src="https://www.dronahq.com/wp-content/uploads/2023/02/logoWhite.png" alt="DronaHQ Logo">
+        </div>
+        <div class="tagline">DronaHQ Intelligence Platform</div>
+    </header>
+
+    <main id="slideContainer">
+        
+        <div class="slide active">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;">
+                <span style="padding: 6px 16px; border: 1px solid rgba(96, 165, 250, 0.3); border-radius: 50px; color: var(--primary-light); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px;">Confidential Pitch Deck</span>
+                <h1 style="font-size: 4.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 24px;">
+                    Deliver Agentic Intelligence.<br>
+                    <span class="gradient-text">Fastest.</span>
+                </h1>
+                <p style="font-size: 1.5rem; color: var(--text-muted); font-weight: 300; line-height: 1.5;">
+                    The DronaHQ Multi-Tool Orchestrator.<br>
+                    Upping the Enterprise IQ for the Autonomous Era.
+                </p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; max-width: 900px; margin: 0 auto;">
+                <h2 style="font-size: 1.5rem; color: var(--primary-light); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 40px;">The Strategic Mandate</h2>
+                <blockquote style="font-size: 3rem; font-weight: 700; color: white; line-height: 1.2; margin-bottom: 32px;">
+                    "By 2026, 75% of enterprises will shift from 'AI as a Chatbot' to <span style="color: var(--accent-cyan);">'AI as an Agent'</span>—autonomous systems that can plan and execute."
+                </blockquote>
+                <div style="font-size: 1.5rem; color: var(--text-muted); font-weight: 400;">— Gartner Strategic Trends</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title" style="text-align: center; margin-bottom: 48px;">Defining True Agentic AI</h2>
+            <div class="grid-2">
+                <div class="card" style="border-top: 4px solid var(--text-muted); opacity: 0.8;">
+                    <h3 style="font-size: 1.75rem; color: white; margin-bottom: 16px; text-decoration: line-through decoration-red-500;">Agentic AI is NOT...</h3>
+                    <p style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 24px;">Just giving your employees Copilot or ChatGPT.</p>
+                    <ul class="bulleted" style="font-size: 1.1rem; line-height: 1.8;">
+                        <li>Requires a human to type prompts.</li>
+                        <li>Outputs text or code (passive).</li>
+                        <li>Acts as a highly advanced "calculator."</li>
+                        <li>Cannot take actions in your systems independently.</li>
+                    </ul>
+                </div>
+                <div class="card" style="border-top: 4px solid var(--primary-light); background: rgba(37, 99, 235, 0.1);">
+                    <h3 style="font-size: 1.75rem; color: var(--primary-light); margin-bottom: 16px;">Agentic AI IS...</h3>
+                    <p style="color: white; font-size: 1.2rem; margin-bottom: 24px;">Systems that plan, reason, and <strong style="color: var(--accent-cyan);">execute work</strong>.</p>
+                    <ul class="bulleted" style="font-size: 1.1rem; line-height: 1.8;">
+                        <li>Triggered by events (Webhooks, CRON jobs).</li>
+                        <li>Outputs <strong>actions</strong> (Updates DB, sends API calls).</li>
+                        <li>Acts as a digital "coworker."</li>
+                        <li>Iterates on errors autonomously until the goal is met.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title" style="text-align: center; margin-bottom: 24px;">The Enterprise Agentic AI Maturity Curve</h2>
+            
+            <div class="chart-container">
+                <div class="svg-wrapper">
+                    <div class="y-axis-label">Enterprise Value &rarr;</div>
+                    <div class="x-axis-label">AI Adoption Maturity & Time &rarr;</div>
+
+                    <div class="zones-container">
+                        <div class="zone naive active" data-stage="0">
+                            <div class="zone-title">Stage 1: Naive</div>
+                        </div>
+                        <div class="zone inter" data-stage="1">
+                            <div class="zone-title">Stage 2: Intermediate</div>
+                        </div>
+                        <div class="zone mature" data-stage="2">
+                            <div class="zone-title">Stage 3: Mature</div>
+                        </div>
+                    </div>
+
+                    <svg class="s-curve-svg" viewBox="0 0 1000 500" preserveAspectRatio="none">
+                        <path class="curve-path" d="M 0 450 C 350 450, 400 250, 500 250 C 600 250, 650 80, 1000 50" />
+                        <path id="activeCurve" class="curve-glow" d="M 0 450 C 350 450, 400 250, 500 250 C 600 250, 650 80, 1000 50" />
+                        <circle class="point naive" cx="166" cy="450" r="10" />
+                        <circle class="point inter" cx="500" cy="250" r="8" />
+                        <circle class="point mature" cx="833" cy="65" r="8" />
+                    </svg>
+                </div>
+
+                <div class="info-card" id="infoCard">
+                    <div class="info-content" id="infoContent">
+                        <div class="info-subtitle" id="cardSubtitle">Individual Productivity</div>
+                        <div class="info-details" id="cardDetails">
+                            Employees using Copilot/ChatGPT manually. No system integration. High risk of data leakage. <span style="color: var(--color-naive); font-weight: bold;">Low enterprise value.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title" style="text-align: center; margin-bottom: 12px;">The New Math: Enterprise Value</h2>
+            <p style="text-align: center; color: var(--text-muted); font-size: 1.1rem; margin-bottom: 32px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                Agentic AI drives a paradigm shift in unit economics—delivering massive ROI by executing operational workflows for mere cents on the dollar.
+            </p>
+            
+            <div class="grid-3" style="gap: 20px;">
+                <div class="metric-card" style="border-top-color: var(--accent-cyan);">
+                    <div style="color: var(--accent-cyan); font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Autonomous Voice</div>
+                    <div class="metric-value">~30¢</div>
+                    <div style="color: var(--text-muted); font-size: 0.95rem;">Per Minute</div>
+                </div>
+                <div class="metric-card" style="border-top-color: var(--accent-emerald);">
+                    <div style="color: var(--accent-emerald); font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">IT/CX Ticketing</div>
+                    <div class="metric-value">~50¢</div>
+                    <div style="color: var(--text-muted); font-size: 0.95rem;">Per Ticket Resolved</div>
+                </div>
+                <div class="metric-card" style="border-top-color: var(--accent-purple);">
+                    <div style="color: var(--accent-purple); font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Recruiting Agent</div>
+                    <div class="metric-value">~30¢</div>
+                    <div style="color: var(--text-muted); font-size: 0.95rem;">Per Resume Processed</div>
+                </div>
+                <div class="metric-card" style="border-top-color: var(--accent-orange);">
+                    <div style="color: var(--accent-orange); font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Sales Outreach</div>
+                    <div class="metric-value">~30¢</div>
+                    <div style="color: var(--text-muted); font-size: 0.95rem;">Per Lead Contacted</div>
+                </div>
+                <div class="metric-card" style="border-top-color: var(--primary-light);">
+                    <div style="color: var(--primary-light); font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">HR Automation</div>
+                    <div class="metric-value">~20¢</div>
+                    <div style="color: var(--text-muted); font-size: 0.95rem;">Per Onboarding Task</div>
+                </div>
+                <div class="metric-card" style="border-top-color: var(--text-main);">
+                    <div style="color: var(--text-main); font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">AR/AP Finance</div>
+                    <div class="metric-value">~40¢</div>
+                    <div style="color: var(--text-muted); font-size: 0.95rem;">Per Invoice Parsed</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title" style="text-align: center; margin-bottom: 12px;">Realizing the ROI: Support Ticketing</h2>
+            <p style="text-align: center; color: var(--text-muted); font-size: 1.1rem; margin-bottom: 40px;">Assuming a volume of <strong style="color: white;">50,000 tickets/month</strong>, here is how the agentic paradigm crushes operational costs.</p>
+            
+            <div class="grid-2">
+                <div class="card" style="border: 2px solid var(--border); background: rgba(248, 113, 113, 0.05);">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <h3 style="color: var(--text-muted); text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px;">The Old Way (Human Only)</h3>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+                        <span style="color: var(--text-muted);">Cost Per Ticket:</span>
+                        <span style="font-weight: bold; font-size: 1.25rem; color: white;">$2.50</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+                        <span style="color: var(--text-muted);">Total Monthly Cost:</span>
+                        <span style="font-weight: bold; font-size: 1.25rem; color: white;">$125,000</span>
+                    </div>
+                    <div style="margin-top: auto; text-align: center; color: var(--accent-red); font-size: 3rem; font-weight: 800; text-decoration: line-through; opacity: 0.7;">
+                        $1.5M / yr
+                    </div>
+                </div>
+
+                <div class="card" style="border: 2px solid var(--accent-emerald); background: rgba(52, 211, 153, 0.05); position: relative;">
+                    <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--accent-emerald); color: var(--bg-dark); font-weight: bold; padding: 4px 16px; border-radius: 20px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">
+                        The Agentic Way
+                    </div>
+                    <div style="text-align: center; margin-top: 16px; margin-bottom: 24px;">
+                        <h3 style="color: white; font-size: 1.1rem;">80% Autonomous Resolution</h3>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem;">
+                        <span style="color: var(--text-muted);">Agent Cost (40k tickets @ 50¢):</span>
+                        <span style="color: white;">$20,000</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 16px; font-size: 0.95rem;">
+                        <span style="color: var(--text-muted);">Human Cost (10k tickets @ $2.50):</span>
+                        <span style="color: white;">$25,000</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+                        <span style="color: var(--accent-emerald); font-weight: bold;">New Monthly Cost:</span>
+                        <span style="font-weight: bold; font-size: 1.5rem; color: var(--accent-emerald);">$45,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 32px; background: linear-gradient(90deg, rgba(52, 211, 153, 0.1), rgba(34, 211, 238, 0.1)); border: 1px solid var(--accent-emerald); border-radius: 16px; padding: 24px; text-align: center;">
+                <h3 style="font-size: 1.25rem; color: var(--text-muted); margin-bottom: 8px;">Total Business Impact</h3>
+                <div class="gradient-text-green" style="font-size: 3.5rem; font-weight: 800; line-height: 1;">
+                    $960,000 Annual Savings
+                </div>
+                <p style="color: var(--text-muted); margin-top: 8px; font-weight: bold;">(A 64% reduction in operational spend)</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title" style="text-align: center; margin-bottom: 24px;">Your Opportunity Today</h2>
+            <p style="text-align: center; color: var(--text-muted); font-size: 1.25rem; margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                The agentic shift is not just about incremental efficiency; it is about fundamentally rewiring enterprise unit economics.
+            </p>
+
+            <div style="background: rgba(34, 211, 238, 0.05); border: 1px solid var(--accent-cyan); border-radius: 16px; padding: 32px; text-align: center; margin-bottom: 40px;">
+                <div style="color: var(--text-muted); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;">The Agentic Multiplier</div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 24px;">
+                    <div style="font-size: 3.5rem; font-weight: 800; color: white;">$1M <span style="font-size: 1.25rem; color: var(--text-muted); font-weight: 400;">OpEx Spend</span></div>
+                    <div style="font-size: 3rem; color: var(--primary-light);">→</div>
+                    <div style="font-size: 3.5rem; font-weight: 800; color: var(--accent-emerald);">~$300k <span style="font-size: 1.25rem; color: var(--text-muted); font-weight: 400;">Unlocked Savings</span></div>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 16px;">*Based on industry benchmarks of 30% automation potential across SG&A and core operations.</p>
+            </div>
+
+            <div class="grid-3">
+                <div class="card" style="border-top: 4px solid var(--accent-emerald);">
+                    <h3 style="font-size: 1.25rem; color: white; margin-bottom: 8px;">💰 Margin Expansion</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Direct bottom-line impact by reducing cost-to-serve in support, HR, and back-office operations.</p>
+                </div>
+                <div class="card" style="border-top: 4px solid var(--accent-purple);">
+                    <h3 style="font-size: 1.25rem; color: white; margin-bottom: 8px;">🤝 Employee & Customer Experience</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Zero-wait-time resolutions for customers, while freeing employees from repetitive "robotic" tasks.</p>
+                </div>
+                <div class="card" style="border-top: 4px solid var(--primary-light);">
+                    <h3 style="font-size: 1.25rem; color: white; margin-bottom: 8px;">🏰 Competitive Moat</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Operating at compute-speed creates an execution advantage that legacy competitors cannot match.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;">
+                <div style="width: 80px; height: 80px; background: var(--primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);">
+                    <span style="font-size: 40px; font-weight: 800; color: white;">D</span>
+                </div>
+                <h2 style="font-size: 3.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 24px; color: white;">
+                    Introduction to <br>
+                    <span class="gradient-text">DronaHQ Intelligence Platform</span>
+                </h2>
+                <p style="font-size: 1.5rem; color: var(--text-muted); max-width: 800px; line-height: 1.6; margin-bottom: 40px;">
+                    Stop building brittle custom wrappers. DronaHQ is the unified, low-code orchestrator that provides all the "Bare Bones" necessary to build, deploy, and govern enterprise AI agents at scale.
+                </p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title" style="text-align: center; margin-bottom: 16px;">The "Bare Bones" of an AI Agent</h2>
+            <p style="text-align: center; color: var(--text-muted); font-size: 1.2rem; margin-bottom: 40px;">To cross the maturity chasm, you need 4 foundational pillars working in unison. DronaHQ provides them all out-of-the-box.</p>
+            
+            <div class="grid-2x2" style="height: 100%;">
+                
+                <div class="card" style="border-left: 4px solid var(--primary-light);">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div class="icon-box" style="color: var(--primary-light); margin-bottom: 0;">🧠</div>
+                        <h3 style="font-size: 1.5rem; color: white;">1. The Core Logic (Brain)</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.6; margin-bottom: 16px;">The reasoning engine that processes intent and plans execution.</p>
+                    <ul class="bulleted" style="font-size: 0.95rem;">
+                        <li><strong>Model Agnostic:</strong> Seamlessly swap between OpenAI, Anthropic Claude, Gemini, or Llama.</li>
+                        <li><strong>Prompt Chaining:</strong> Break down complex goals into multi-step thought processes.</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-left: 4px solid var(--accent-purple);">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div class="icon-box" style="color: var(--accent-purple); margin-bottom: 0;">🗄️</div>
+                        <h3 style="font-size: 1.5rem; color: white;">2. The Context (Memory)</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.6; margin-bottom: 16px;">The long-term knowledge required to understand enterprise-specific rules.</p>
+                    <ul class="bulleted" style="font-size: 0.95rem;">
+                        <li><strong>Vector DB Integration:</strong> Native hooks to Pinecone, Milvus, etc. for deep RAG.</li>
+                        <li><strong>Session Memory:</strong> Retain conversational history across multi-turn interactions.</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-left: 4px solid var(--accent-emerald);">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div class="icon-box" style="color: var(--accent-emerald); margin-bottom: 0;">⚙️</div>
+                        <h3 style="font-size: 1.5rem; color: white;">3. The Tools (Hands)</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.6; margin-bottom: 16px;">The mechanisms required to take action in the real world.</p>
+                    <ul class="bulleted" style="font-size: 0.95rem;">
+                        <li><strong>APIs & DBs:</strong> REST, GraphQL, SQL, NoSQL.</li>
+                        <li><strong>SaaS & MCPs:</strong> Model Context Protocols for secure interaction with Salesforce, Jira, HRMS.</li>
+                        <li><strong>In-built Utilities:</strong> Web search, PDF parsers, Date/Time logic.</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-left: 4px solid var(--accent-orange);">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div class="icon-box" style="color: var(--accent-orange); margin-bottom: 0;">🛡️</div>
+                        <h3 style="font-size: 1.5rem; color: white;">4. Governance (Guardrails)</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.6; margin-bottom: 16px;">The safety net required for CTOs to trust autonomous systems.</p>
+                    <ul class="bulleted" style="font-size: 0.95rem;">
+                        <li><strong>Observability:</strong> Full execution traces (audit why an agent made a decision).</li>
+                        <li><strong>Control:</strong> PII Masking and Hallucination checks.</li>
+                        <li><strong>Human-in-the-Loop:</strong> Pause agents for manager approval before critical writes.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title" style="text-align: center; margin-bottom: 12px;">How It Works: The Orchestration Loop</h2>
+            <p style="text-align: center; color: var(--text-muted); font-size: 1.1rem; margin-bottom: 48px;">Watch DronaHQ route a complex request from trigger to secure execution in milliseconds.</p>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; height: 100%; gap: 16px; position: relative;">
+                
+                <div style="position: absolute; top: 50%; left: 5%; right: 5%; height: 4px; background: linear-gradient(90deg, var(--primary), var(--accent-emerald)); z-index: 0; transform: translateY(-50%); border-radius: 4px; opacity: 0.5;"></div>
+
+                <div class="card" style="flex: 1; z-index: 1; border: 2px solid var(--border); background: var(--bg-card); align-items: center; text-align: center; padding: 32px 16px;">
+                    <div style="width: 56px; height: 56px; background: rgba(96, 165, 250, 0.1); color: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px; border: 2px solid var(--primary-light);">1</div>
+                    <h3 style="font-size: 1.1rem; color: white; margin-bottom: 8px;">The Trigger</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">An event occurs: a Webhook fires, a CRON job runs, or a User sends a Chat.</p>
+                </div>
+
+                <div class="card" style="flex: 1; z-index: 1; border: 2px solid var(--border); background: var(--bg-card); align-items: center; text-align: center; padding: 32px 16px;">
+                    <div style="width: 56px; height: 56px; background: rgba(192, 132, 252, 0.1); color: var(--accent-purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px; border: 2px solid var(--accent-purple);">2</div>
+                    <h3 style="font-size: 1.1rem; color: white; margin-bottom: 8px;">Context Prep</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">DronaHQ checks the <strong>Vector DB</strong> for enterprise rules and history.</p>
+                </div>
+
+                <div class="card" style="flex: 1; z-index: 1; border: 2px solid var(--border); background: var(--bg-card); align-items: center; text-align: center; padding: 32px 16px;">
+                    <div style="width: 56px; height: 56px; background: rgba(37, 99, 235, 0.1); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px; border: 2px solid var(--primary);">3</div>
+                    <h3 style="font-size: 1.1rem; color: white; margin-bottom: 8px;">LLM Reasoning</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">The underlying Model decides <em>which</em> internal tools it needs to call to solve the task.</p>
+                </div>
+
+                <div class="card" style="flex: 1; z-index: 1; border: 2px solid var(--border); background: var(--bg-card); align-items: center; text-align: center; padding: 32px 16px;">
+                    <div style="width: 56px; height: 56px; background: rgba(251, 146, 60, 0.1); color: var(--accent-orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px; border: 2px solid var(--accent-orange);">4</div>
+                    <h3 style="font-size: 1.1rem; color: white; margin-bottom: 8px;">Tool Execution</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">DronaHQ safely executes the API/MCP call (e.g., updating Salesforce).</p>
+                </div>
+
+                <div class="card" style="flex: 1; z-index: 1; border: 2px solid var(--accent-emerald); background: rgba(52, 211, 153, 0.05); align-items: center; text-align: center; padding: 32px 16px; box-shadow: 0 10px 25px rgba(52, 211, 153, 0.1);">
+                    <div style="width: 56px; height: 56px; background: var(--accent-emerald); color: var(--bg-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px; font-weight: bold;">5</div>
+                    <h3 style="font-size: 1.1rem; color: var(--accent-emerald); margin-bottom: 8px;">Resolution</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Output passes through guardrails and the final action is safely completed.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title" style="text-align: center; margin-bottom: 16px;">Enterprise Use Cases Unlocked</h2>
+            <p style="text-align: center; color: var(--text-muted); font-size: 1.2rem; margin-bottom: 40px;">The right tools dictate the agent's capabilities. DronaHQ provides them all.</p>
+            
+            <div class="grid-3" style="height: 100%;">
+                
+                <div class="card" style="border-top: 4px solid var(--accent-purple);">
+                    <div class="icon-box" style="color: var(--accent-purple); margin-bottom: 16px;">🗄️</div>
+                    <h3 style="font-size: 1.5rem; color: white; margin-bottom: 8px;">RAG Agents</h3>
+                    <div style="background: var(--bg-dark); padding: 8px 12px; border-radius: 6px; display: inline-block; margin-bottom: 24px; font-size: 0.85rem; color: var(--text-muted);">
+                        Powered by: <span style="color: var(--accent-purple); font-weight: bold;">Vector DBs</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; margin-bottom: 16px; flex-grow: 1;">Agents that can search, synthesize, and answer questions based on your internal unstructured data.</p>
+                    <ul class="bulleted" style="font-size: 0.95rem; margin-top: auto;">
+                        <li>HR Policy & Benefits Q&A</li>
+                        <li>Legal Contract Analysis</li>
+                        <li>Sales Playbook Retrieval</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--accent-emerald);">
+                    <div class="icon-box" style="color: var(--accent-emerald); margin-bottom: 16px;">📄</div>
+                    <h3 style="font-size: 1.5rem; color: white; margin-bottom: 8px;">OCR / Vision Agents</h3>
+                    <div style="background: var(--bg-dark); padding: 8px 12px; border-radius: 6px; display: inline-block; margin-bottom: 24px; font-size: 0.85rem; color: var(--text-muted);">
+                        Powered by: <span style="color: var(--accent-emerald); font-weight: bold;">File Parsers</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; margin-bottom: 16px; flex-grow: 1;">Agents capable of "reading" and extracting structured data from PDFs, images, and scanned documents.</p>
+                    <ul class="bulleted" style="font-size: 0.95rem; margin-top: auto;">
+                        <li>AR/AP Invoice Processing</li>
+                        <li>KYC / Identity Verification</li>
+                        <li>Resume Screening (ATS)</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--primary-light);">
+                    <div class="icon-box" style="color: var(--primary-light); margin-bottom: 16px;">⚡</div>
+                    <h3 style="font-size: 1.5rem; color: white; margin-bottom: 8px;">Action / Chat Agents</h3>
+                    <div style="background: var(--bg-dark); padding: 8px 12px; border-radius: 6px; display: inline-block; margin-bottom: 24px; font-size: 0.85rem; color: var(--text-muted);">
+                        Powered by: <span style="color: var(--primary-light); font-weight: bold;">SaaS Tools & MCPs</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; margin-bottom: 16px; flex-grow: 1;">Agents that execute workflows and write data directly into your enterprise software stack.</p>
+                    <ul class="bulleted" style="font-size: 0.95rem; margin-top: auto;">
+                        <li>Automated CRM Data Entry</li>
+                        <li>L1/L2 IT Ticket Resolution</li>
+                        <li>Sales Outreach Sequences</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title" style="text-align: center; margin-bottom: 40px;">Why DronaHQ? (The USP)</h2>
+            <div class="grid-3" style="height: 100%;">
+                
+                <div class="card" style="border-top: 3px solid var(--primary-light); padding: 24px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="font-size: 1.75rem;">🛠️</div>
+                        <h3 style="font-size: 1.25rem; color: white; line-height: 1.2;">Extensible Integration Ecosystem</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Native, plug-and-play connectors for SaaS, SQL/NoSQL databases, REST/GraphQL APIs, and emerging Model Context Protocols (MCPs).</p>
+                </div>
+
+                <div class="card" style="border-top: 3px solid var(--accent-emerald); padding: 24px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="font-size: 1.75rem;">🎯</div>
+                        <h3 style="font-size: 1.25rem; color: white; line-height: 1.2;">Pre-Built Agentic Skills</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Accelerate development with a comprehensive library of out-of-the-box utility skills—including web scraping, complex file parsing, and data transformation.</p>
+                </div>
+
+                <div class="card" style="border-top: 3px solid var(--accent-purple); padding: 24px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="font-size: 1.75rem;">🧠</div>
+                        <h3 style="font-size: 1.25rem; color: white; line-height: 1.2;">Deep Context & Memory</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Give agents institutional knowledge with seamless Vector DB integrations, enabling advanced RAG and persistent multi-turn session memory.</p>
+                </div>
+
+                <div class="card" style="border-top: 3px solid var(--accent-cyan); padding: 24px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="font-size: 1.75rem;">🚀</div>
+                        <h3 style="font-size: 1.25rem; color: white; line-height: 1.2;">Built for the Future</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">A truly future-proof architecture. Easily adopt emerging capabilities like Gen-UI, Small Language Models (SLMs), Jepa/Phi, and inference-time compute without rebuilding.</p>
+                </div>
+
+                <div class="card" style="border-top: 3px solid var(--accent-orange); padding: 24px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="font-size: 1.75rem;">🧩</div>
+                        <h3 style="font-size: 1.25rem; color: white; line-height: 1.2;">Abstracted Complexity</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Stop wasting engineering cycles on brittle Python wrappers. We handle the orchestration layer so your team can focus entirely on delivering business logic.</p>
+                </div>
+
+                <div class="card" style="border-top: 3px solid var(--text-main); padding: 24px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="font-size: 1.75rem;">☁️</div>
+                        <h3 style="font-size: 1.25rem; color: white; line-height: 1.2;">Enterprise-Grade Managed Infra</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Fully managed, scalable, and secure cloud infrastructure. Deploy instantly without the overhead of managing the complex AI tech stack.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="slide">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; width: 100%;">
+                
+                <h2 style="font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 40px; color: white;">
+                    Ready to Plug Intelligence<br>
+                    <span class="gradient-text">Into Your Enterprise?</span>
+                </h2>
+                
+                <div class="card" style="max-width: 650px; width: 100%; padding: 32px 40px; margin-bottom: 40px; background: var(--bg-card); border-top: 4px solid var(--primary); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+                    <div style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.3); border-radius: 12px; padding: 24px; margin-bottom: 24px; text-align: center;">
+                        <div style="font-size: 1.2rem; color: white; font-weight: 600; margin-bottom: 8px;">Get your pilot started at</div>
+                        <div style="font-size: 4rem; font-weight: 900; color: var(--accent-cyan); line-height: 1; margin-bottom: 4px;">25¢</div>
+                        <div style="font-size: 1.15rem; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">Per Conversation</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); opacity: 0.8; font-style: italic; margin-top: 12px;">* AI model credits billed extra</div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: center; gap: 40px; align-items: center; border-top: 1px solid var(--border); padding-top: 24px;">
+                        <a href="https://dronahq.ai" target="_blank" style="text-decoration: none; color: var(--accent-cyan); font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: color 0.2s;">
+                            <span style="font-size: 1.5rem;">🌐</span> dronahq.ai
+                        </a>
+                        <a href="mailto:inquiries@dronahq.com" style="text-decoration: none; color: white; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: color 0.2s;">
+                            <span style="font-size: 1.5rem;">✉️</span> inquiries@dronahq.com
+                        </a>
+                    </div>
+                </div>
+
+                <div style="width: 100%; max-width: 1000px; margin-top: 10px;">
+                    <p style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px;">Trusted by Innovative Enterprises</p>
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 40px; opacity: 0.5; filter: grayscale(100%);">
+                        <span style="font-size: 1.6rem; font-weight: 800; font-family: 'Times New Roman', serif; color: white;">Mondelēz</span>
+                        <span style="font-size: 1.6rem; font-weight: 700; letter-spacing: -1px; font-family: sans-serif; color: white;">deriv</span>
+                        <span style="font-size: 1.6rem; font-weight: 600; font-family: sans-serif; color: white;">Purplle</span>
+                        <span style="font-size: 1.75rem; font-weight: 900; letter-spacing: 1px; font-family: sans-serif; color: white;">wipro</span>
+                        <span style="font-size: 1.6rem; font-weight: 800; font-style: italic; font-family: sans-serif; color: white;">AlGihaz</span>
+                        <span style="font-size: 1.5rem; font-weight: 500; font-family: sans-serif; color: white;">Edme Insurance</span>
+                        <span style="font-size: 1.6rem; font-weight: 800; text-transform: uppercase; font-family: sans-serif; color: white;">Colgate</span>
+                        <span style="font-size: 1.6rem; font-weight: 700; font-family: Arial, sans-serif; color: white;">Nestlé</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div id="slideCounter" style="color: var(--text-muted); font-weight: 600;">Slide 1 of 13</div>
+        <div style="display: flex; gap: 16px;">
+            <button id="prevBtn" class="btn" disabled>← Previous</button>
+            <button id="nextBtn" class="btn btn-primary">Next →</button>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            /* --- Slide Navigation Logic --- */
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const counter = document.getElementById('slideCounter');
+            const progressBar = document.getElementById('progressBar');
+            
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            function updateUI() {
+                slides.forEach((slide, index) => {
+                    if (index === currentSlide) slide.classList.add('active');
+                    else slide.classList.remove('active');
+                });
+                counter.innerText = `Slide ${currentSlide + 1} of ${totalSlides}`;
+                progressBar.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === totalSlides - 1;
+            }
+
+            function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateUI(); } }
+            function prevSlide() { if (currentSlide > 0) { currentSlide--; updateUI(); } }
+
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+                else if (e.key === 'ArrowLeft') prevSlide();
+            });
+
+            updateUI(); // Init slide
+
+            /* --- Maturity Curve Logic (Slide 4) --- */
+            const stageData = [
+                {
+                    id: 'naive', color: '#60a5fa', subtitle: "Individual Productivity",
+                    details: "Employees using Copilot/ChatGPT manually. No system integration. High risk of data leakage. <span style='color: #60a5fa; font-weight: 600;'>Low enterprise value.</span>"
+                },
+                {
+                    id: 'inter', color: '#c084fc', subtitle: "Siloed Point-Solutions",
+                    details: "Fragmented adoption of agentic tools (e.g., Fin.ai for CX, Cursor for Devs). Agents act in silos without cross-functional context. <span style='color: #c084fc; font-weight: 600;'>Medium value.</span>"
+                },
+                {
+                    id: 'mature', color: '#34d399', subtitle: "Enterprise-Wide Orchestration",
+                    details: "Centralized Agentic Platform (like DronaHQ). Connects Org Context (CRM/ATS), Knowledge Bases, and active execution via Model Context Protocols (MCPs). <span style='color: #34d399; font-weight: 600;'>Exponential enterprise value.</span>"
+                }
+            ];
+
+            const zones = document.querySelectorAll('.zone');
+            const points = document.querySelectorAll('.point');
+            const activeCurve = document.getElementById('activeCurve');
+            const infoCard = document.getElementById('infoCard');
+            const infoContent = document.getElementById('infoContent');
+            const cardSubtitle = document.getElementById('cardSubtitle');
+            const cardDetails = document.getElementById('cardDetails');
+
+            function setStage(index) {
+                const data = stageData[index];
+                zones.forEach((z, i) => { if (i === index) z.classList.add('active'); else z.classList.remove('active'); });
+                points.forEach((p, i) => {
+                    if (i === index) { p.setAttribute('r', '14'); p.style.fill = data.color; }
+                    else { p.setAttribute('r', '8'); p.style.fill = 'var(--bg-card)'; }
+                });
+                
+                if (activeCurve) {
+                    activeCurve.style.stroke = data.color;
+                    activeCurve.style.filter = `drop-shadow(0 0 15px ${data.color})`;
+                }
+                
+                if(infoContent && infoCard && cardSubtitle && cardDetails) {
+                    infoContent.classList.add('fade');
+                    infoCard.style.borderTopColor = data.color;
+                    
+                    setTimeout(() => {
+                        cardSubtitle.innerText = data.subtitle;
+                        cardSubtitle.style.color = data.color;
+                        cardDetails.innerHTML = data.details;
+                        infoContent.classList.remove('fade');
+                    }, 200);
+                }
+            }
+
+            zones.forEach((zone) => {
+                const handler = function() { setStage(parseInt(this.getAttribute('data-stage'))); };
+                zone.addEventListener('mouseenter', handler);
+                zone.addEventListener('click', handler);
+            });
+
+            if (zones.length > 0) {
+                setStage(0); 
+            }
+        });
+    </script>
+</body>
+</html>
