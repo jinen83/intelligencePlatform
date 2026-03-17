@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -179,6 +180,15 @@
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: stretch; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
         .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        
+        ul.bulleted li::before { content: "•"; color: var(--primary-light); display: inline-block; width: 1em; margin-left: -1em; }
+        ul.bulleted li { padding-left: 1em; margin-bottom: 8px; color: var(--text-muted); font-size: 0.95rem; }
+        
+        .faq-item { margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+        .faq-q { color: var(--primary-light); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .faq-a { color: var(--text-main); line-height: 1.6; font-size: 1rem; padding-left: 28px; }
+
+        .pricing-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; width: 100%; }
 
         .icon-box {
             width: 48px;
@@ -244,6 +254,15 @@
         .info-content { transition: opacity 0.2s ease, transform 0.2s ease; }
         .info-content.fade { opacity: 0; transform: translateY(10px); }
         .info-subtitle { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: white; }
+        
+         .services-menu {
+            margin-top: 15px; background: rgba(2, 6, 23, 0.4); border-radius: 12px; padding: 15px; border: 1px solid var(--border);
+        }
+        .service-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.9rem; }
+        .service-price { color: var(--accent-emerald); font-weight: 700; }
+
+        .disclaimer { font-size: 0.75rem; color: var(--text-muted); font-style: italic; line-height: 1.4; margin-top: 12px; }
+        
         .info-details { color: var(--text-muted); font-size: 1rem; line-height: 1.5; }
     </style>
 </head>
@@ -760,49 +779,87 @@
 
             </div>
         </div>
-
+        
         <div class="slide">
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; width: 100%;">
-                
-                <h2 style="font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 40px; color: white;">
-                    Ready to Plug Intelligence<br>
-                    <span class="gradient-text">Into Your Enterprise?</span>
-                </h2>
-                
-                <div class="card" style="max-width: 650px; width: 100%; padding: 32px 40px; margin-bottom: 40px; background: var(--bg-card); border-top: 4px solid var(--primary); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
-                    <div style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.3); border-radius: 12px; padding: 24px; margin-bottom: 24px; text-align: center;">
-                        <div style="font-size: 1.2rem; color: white; font-weight: 600; margin-bottom: 8px;">Get your pilot started at</div>
-                        <div style="font-size: 4rem; font-weight: 900; color: var(--accent-cyan); line-height: 1; margin-bottom: 4px;">25¢</div>
-                        <div style="font-size: 1.15rem; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">Per Job</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted); opacity: 0.8; font-style: italic; margin-top: 12px;">* AI model credits billed extra</div>
+            <h2 class="slide-title">Pricing & Services</h2>
+            <div class="pricing-grid">
+                <div class="card" style="border-top: 4px solid var(--accent-cyan); display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <div><h3 style="font-size: 1.5rem;">PAYG (Pilot)</h3><p style="color: var(--primary-light); font-weight: 700; font-size: 0.8rem;">Build Powerful Agents</p></div>
+                        <div style="text-align: right;"><span style="font-size: 2rem; font-weight: 800;">50¢</span><p style="font-size: 0.7rem; color: var(--text-muted);">Approx. Per Transaction</p></div>
                     </div>
                     
-                    <div style="display: flex; justify-content: center; gap: 40px; align-items: center; border-top: 1px solid var(--border); padding-top: 24px;">
-                        <a href="https://dronahq.ai" target="_blank" style="text-decoration: none; color: var(--accent-cyan); font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: color 0.2s;">
-                            <span style="font-size: 1.5rem;">🌐</span> dronahq.ai
-                        </a>
-                        <a href="mailto:inquiries@dronahq.com" style="text-decoration: none; color: white; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: color 0.2s;">
-                            <span style="font-size: 1.5rem;">✉️</span> inquiries@dronahq.com
-                        </a>
+                    <div class="disclaimer">
+                        * Note: 50¢ is an estimate. Costs vary by model; for instance, Claude 3.5 Sonnet is significantly more expensive than GPT-4o. Pricing is meant for <strong>pilot phase only</strong>.
+                    </div>
+
+                    <div class="services-menu">
+                        <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-emerald); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">Optional Services Menu</div>
+                        <div class="service-item">
+                            <span>🛠️ <strong>Agent Build</strong> (Initial setup)</span>
+                            <span class="service-price">$2,000 / 2 wks</span>
+                        </div>
+                        <div class="service-item">
+                            <span>🧬 <strong>Agent Finetuning</strong></span>
+                            <span class="service-price">$2,000 / +2 wks</span>
+                        </div>
+                        <div class="service-item" style="margin-bottom: 0;">
+                            <span>📊 <strong>Evals Setup</strong></span>
+                            <span class="service-price">$1,250 / +1 wk</span>
+                        </div>
                     </div>
                 </div>
 
-                <div style="width: 100%; max-width: 1000px; margin-top: 10px;">
-                    <p style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px;">Trusted by Innovative Enterprises</p>
-                    <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 40px; opacity: 0.5; filter: grayscale(100%);">
-                        <span style="font-size: 1.6rem; font-weight: 800; font-family: 'Times New Roman', serif; color: white;">Mondelēz</span>
-                        <span style="font-size: 1.6rem; font-weight: 700; letter-spacing: -1px; font-family: sans-serif; color: white;">deriv</span>
-                        <span style="font-size: 1.6rem; font-weight: 600; font-family: sans-serif; color: white;">Purplle</span>
-                        <span style="font-size: 1.75rem; font-weight: 900; letter-spacing: 1px; font-family: sans-serif; color: white;">wipro</span>
-                        <span style="font-size: 1.6rem; font-weight: 800; font-style: italic; font-family: sans-serif; color: white;">AlGihaz</span>
-                        <span style="font-size: 1.5rem; font-weight: 500; font-family: sans-serif; color: white;">Edme Insurance</span>
-                        <span style="font-size: 1.6rem; font-weight: 800; text-transform: uppercase; font-family: sans-serif; color: white;">Colgate</span>
-                        <span style="font-size: 1.6rem; font-weight: 700; font-family: Arial, sans-serif; color: white;">Nestlé</span>
+                <div class="card" style="border-top: 4px solid var(--accent-purple);">
+                    <h3 style="font-size: 1.5rem;">Enterprise</h3>
+                    <p style="color: var(--accent-purple); font-weight: 800; margin-bottom: 10px;">Custom Pricing</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 5px;">
+                        <ul class="bulleted">
+                            <li>SSO, RBAC & HIPAA</li>
+                            <li>Zero Data Retention (ZDR)</li>
+                            <li>60 Day Data Retention</li>
+                            <li>Dedicated AM & SLA</li>
+                            <li>Custom Guardrails & Contracts</li>
+                        </ul>
                     </div>
                 </div>
-
             </div>
         </div>
+
+        <div class="slide">
+            <h2 class="slide-title">Frequently Asked Questions</h2>
+            <div class="card" style="flex: 1; overflow-y: auto;">
+                <div class="faq-item">
+                    <div class="faq-q">Q: What if the build exceeds the initial 2-week timeline?</div>
+                    <div class="faq-a">For complex requirements, additional build time is billed at <strong>$1,250 per week</strong>.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Q: How is a "transaction" defined?</div>
+                    <div class="faq-a">A transaction is one complete job/activity (targeted at 50¢). If the job requires an extended conversation, it is <strong>10¢ per additional message</strong>.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Q: Can I upgrade to Enterprise?</div>
+                    <div class="faq-a">Yes, you can upgrade at any time by contacting our sales team to unlock compliance and dedicated support.</div>
+                </div>
+                <div class="faq-item" style="border: none;">
+                    <div class="faq-q">Q: What happens if I have zero usage?</div>
+                    <div class="faq-a">You aren't charged for idle time. We host agents for <strong>30 days</strong> after credits reach zero before decommissioning.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;">
+                <h2 style="font-size: 3rem; font-weight: 800; margin-bottom: 30px;">Ready to start your pilot?</h2>
+                <div style="display: flex; gap: 30px;">
+                    <a href="https://dronahq.ai" style="color: var(--accent-cyan); font-size: 1.2rem; text-decoration: none; font-weight: bold;">🌐 dronahq.ai</a>
+                    <a href="mailto:sales@dronahq.com" style="color: white; font-size: 1.2rem; text-decoration: none; font-weight: bold;">✉️ inquiries@dronahq.com</a>
+                </div>
+            </div>
+        </div>
+
+        
+      
 
     </main>
 
