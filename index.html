@@ -278,8 +278,39 @@
     </header>
 
     <main id="slideContainer">
+        <div class='slide slide--opening active'>
+            <div style='display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:20px;'>
+                <span style='padding:6px 16px;border:1px solid rgba(96,165,250,0.3);border-radius:50px;color:var(--primary-light);font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:2px;'>Start Here</span>
+                <h1 data-primary-heading style='font-size:3rem;font-weight:800;line-height:1.1;'>What do you want to explore?</h1>
+                <p style='color:var(--text-muted);max-width:800px;line-height:1.6;'>Choose your path to jump directly into an overview of our Agentic Intelligence platform or browse featured enterprise apps built on DronaHQ.</p>
+                <div style='display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:8px;'>
+                    <button class='btn btn-primary' data-goto="agents" aria-label='Go to Intelligence overview'>Explore Agents →</button>
+                    <button class='btn' data-goto="apps" aria-label='Go to Apps showcase'>Explore Apps</button>
+                </div>
+            </div>
+        </div>
+<div class="slide slide--apps" id="apps">
+<h2 class="slide-title" data-primary-heading style="text-align: center; margin-bottom: 24px;">Featured Apps Built on DronaHQ</h2>
+<p style="text-align: center; color: var(--text-muted); font-size: 1.1rem; margin-bottom: 28px;">A quick look at real applications powered by our Agentic platform.</p>
+<div class="grid-3">
+<div class="card" style="border-top: 4px solid var(--primary-light);">
+<div class="icon-box" style="color: var(--primary-light);">💬</div>
+<h3 style="font-size: 1.25rem; color: white; margin-bottom: 6px;">Support Copilot</h3>
+<p style="color: var(--text-muted);">Auto-triages tickets, drafts responses, and resolves L2 issues with connected tools.</p>
+</div>
+<div class="card" style="border-top: 4px solid var(--accent-emerald);">
+<div class="icon-box" style="color: var(--accent-emerald);">📊</div>
+<h3 style="font-size: 1.25rem; color: white; margin-bottom: 6px;">Revenue Ops Console</h3>
+<p style="color: var(--text-muted);">Summarizes pipeline health and executes CRM updates across accounts automatically.</p>
+</div>
+<div class="card" style="border-top: 4px solid var(--accent-purple);">
+<h3 style="font-size: 1.25rem; color: white; margin-bottom: 6px;">Invoice Automation</h3>
+<p style="color: var(--text-muted);">Parses invoices, validates against PO, and posts to ERP with human-in-the-loop. </p>
+</div>
+</div>
+</div>
         
-        <div class="slide active">
+        <div class="slide">
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;">
                 <span style="padding: 6px 16px; border: 1px solid rgba(96, 165, 250, 0.3); border-radius: 50px; color: var(--primary-light); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px;">Confidential Pitch Deck</span>
                 
@@ -503,6 +534,7 @@
                     <span style="font-size: 40px; font-weight: 800; color: white;">D</span>
                 </div>
                 <h2 style="font-size: 3.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 24px; color: white;">
+                <span id='agents' aria-hidden='true'></span>
                     Introduction to <br>
                     <span class="gradient-text">DronaHQ Intelligence Platform</span>
                 </h2>
@@ -906,6 +938,7 @@
 
             updateUI(); // Init slide
 
+            document.getElementById('slideContainer').addEventListener('click', (e)=>{ const t=e.target.closest('[data-goto]'); if(!t)return; e.preventDefault(); const id=t.dataset.goto; const a=document.getElementById(id); const s=a?a.closest('.slide'):document.querySelector('.slide#'+id); const slidesArr=[...document.querySelectorAll('.slide')]; const i=s?slidesArr.indexOf(s):-1; if(i>=0){ currentSlide=i; updateUI(); const h=s.querySelector('[data-primary-heading], h1, h2'); if(h){ h.setAttribute('tabindex','-1'); try{h.focus({preventScroll:false});}catch(err){h.focus();}} } });
             /* --- Maturity Curve Logic (Slide 4) --- */
             const stageData = [
                 {
